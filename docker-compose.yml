@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  scraper:
+    build: .
+    container_name: ac_schnitzer_bot
+    restart: unless-stopped
+    
+    # OPTION 1: Run as a background scheduler (Default)
+    # command: python scheduler.py
+    
+    # OPTION 2: Run as a Web UI (Uncomment to use)
+    command: streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+      
+    volumes:
+      # Persist the critical data files so they survive restarts
+      - ./data:/app/data
+      # Persist the output CSVs
+      - ./output:/app/output
+      
+    environment:
+      - TZ=UTC # Set your desired timezone
