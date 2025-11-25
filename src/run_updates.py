@@ -159,11 +159,14 @@ def get_existing_products(json_path: Path) -> Dict[str, List[str]]:
     Loads existing products from json.
     Returns a dict mapping normalized_url -> list of original_urls.
     """
+    console.print(f"[info]Checking for existing products at: {json_path.absolute()}[/info]")
+    
     if not json_path.exists():
         console.print(f"[warning]{json_path} not found. Assuming no existing products.[/warning]")
         return {}
     
     try:
+        console.print(f"[info]Loading existing products from {json_path.name}...[/info]")
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
@@ -179,9 +182,14 @@ def get_existing_products(json_path: Path) -> Dict[str, List[str]]:
                     # Let's store the details directly in a wrapper or just reference the dict in memory?
                     # Since we loaded 'data' into memory, we can store references to the 'details' dict.
                     products_map[norm_url].append({'url': url, 'details': details})
+        
+        console.print(f"[success]Loaded {len(products_map)} unique products from existing database.[/success]")
         return products_map
+    except json.JSONDecodeError as e:
+        console.print(f"[error]Error parsing JSON from {json_path}: {e}[/error]")
+        return {}
     except Exception as e:
-        console.print(f"[error]Error loading existing products: {e}[/error]")
+        console.print(f"[error]Error loading existing products from {json_path.absolute()}: {e}[/error]")
         return {}
 
 def identify_updates(sitemap_urls: Dict[str, str], existing_products_map: Dict[str, List[Dict]]) -> List[str]:
@@ -267,8 +275,10 @@ def update_product_details_lastmod(json_path: Path, sitemap_urls: Dict[str, str]
                             details['lastmod'] = new_lastmod
                             updated_count += 1
 
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2)
+        with open(json_path, 'w', encoding='utf-8', newline='') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
             
         console.print(f"[success]Updated lastmod dates for {updated_count} products in {json_path.name}[/success]")
             
@@ -327,8 +337,10 @@ def merge_updates(main_file: Path, updates_file: Path, sitemap_urls: Dict[str, s
         main_data['meta']['brand_counts'] = {b: len(i) for b, i in main_data['products'].items()}
 
         # Save main file
-        with open(main_file, 'w', encoding='utf-8') as f:
-            json.dump(main_data, f, indent=2)
+        with open(main_file, 'w', encoding='utf-8', newline='') as f:
+            json.dump(main_data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
             
         console.print(f"[success]Merged {merged_count} products into {main_file.name}[/success]")
 

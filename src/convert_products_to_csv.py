@@ -86,12 +86,29 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_products(path: Path) -> Dict[str, Dict[str, Any]]:
-    with path.open("r", encoding="utf-8") as fp:
-        payload = json.load(fp)
-    products = payload.get("products")
-    if not isinstance(products, dict):
-        raise ValueError("Invalid JSON structure: missing 'products' mapping")
-    return products
+    try:
+        print(f"Loading products from: {path.absolute()}")
+        if not path.exists():
+            raise FileNotFoundError(f"Product file not found: {path.absolute()}")
+        
+        with path.open("r", encoding="utf-8") as fp:
+            payload = json.load(fp)
+        
+        products = payload.get("products")
+        if not isinstance(products, dict):
+            raise ValueError("Invalid JSON structure: missing 'products' mapping")
+        
+        print(f"Successfully loaded {sum(len(items) for items in products.values())} products")
+        return products
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}")
+        raise
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Failed to parse JSON from {path}: {e}")
+        raise
+    except Exception as e:
+        print(f"ERROR: Unexpected error loading products from {path}: {e}")
+        raise
 
 
 def normalize_price(value: Optional[str]) -> str:

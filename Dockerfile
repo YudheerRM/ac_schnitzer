@@ -17,8 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy all scripts
 COPY . .
 
-# Create a directory for outputs if it doesn't exist
-RUN mkdir -p output
+# Create directories for data and outputs if they don't exist
+RUN mkdir -p data output
 
 # Expose the Streamlit port (optional, but good to have ready)
 EXPOSE 8501
