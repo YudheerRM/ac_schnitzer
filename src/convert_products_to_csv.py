@@ -204,6 +204,17 @@ def format_categories(product: Dict[str, Any]) -> str:
         categories = [str(item).strip() for item in raw_path if str(item).strip()]
     else:
         categories = []
+    
+    # Fix common misspellings
+    corrected_categories = []
+    for category in categories:
+        # Correct "accessoires" to "accessories" (case-insensitive)
+        if category.lower() == "accessoires":
+            corrected_categories.append("Accessories")
+        else:
+            corrected_categories.append(category)
+    categories = corrected_categories
+    
     brand_value = product.get("brand")
     if brand_value:
         brand_title = str(brand_value).strip().title()
