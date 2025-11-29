@@ -23,5 +23,8 @@ RUN mkdir -p data output
 # Expose the Streamlit port (optional, but good to have ready)
 EXPOSE 8501
 
+# Expose the API port
+EXPOSE 5000
+
 # Default command (can be overridden in docker-compose)
 CMD ["python", "src/scheduler.py"]
