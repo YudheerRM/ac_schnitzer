@@ -218,6 +218,9 @@ def format_categories(product: Dict[str, Any]) -> str:
     brand_value = product.get("brand")
     if brand_value:
         brand_title = str(brand_value).strip().title()
+        if brand_title.lower() == "accessoires":
+            brand_title = "Accessories"
+            
         if brand_title and brand_title.lower() not in {item.lower() for item in categories}:
             categories.insert(0, brand_title)
     if not categories:

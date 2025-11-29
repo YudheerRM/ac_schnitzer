@@ -6,3 +6,4 @@ pandas
 schedule
 streamlit
 watchdog
+flask
