@@ -6,8 +6,21 @@ import re
 import time
 import zipfile
 from pathlib import Path
+import threading
 
 import base64
+
+# --- Start Flask API in background thread ---
+def start_flask_api():
+    """Start the Flask API server in a background thread."""
+    from api import app
+    app.run(host='0.0.0.0', port=5000, threaded=True, use_reloader=False)
+
+# Start Flask API only once (use a flag to prevent multiple starts on Streamlit reruns)
+if 'flask_started' not in st.session_state:
+    flask_thread = threading.Thread(target=start_flask_api, daemon=True)
+    flask_thread.start()
+    st.session_state.flask_started = True
 
 # --- Configuration ---
 st.set_page_config(
